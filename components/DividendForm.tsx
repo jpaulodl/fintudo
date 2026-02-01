@@ -50,6 +50,13 @@ const DividendForm: React.FC = () => {
     });
   };
 
+  // Função de formatação segura
+  const formatDateSafe = (dateString: string) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.substring(0, 10).split('-');
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-500">
       {/* Form Column */}
@@ -139,7 +146,7 @@ const DividendForm: React.FC = () => {
                   dividends.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(div => (
                     <tr key={div.id} className="hover:bg-slate-800/30 transition-colors group">
                       <td className="py-4 font-bold text-slate-200 group-hover:text-emerald-500 transition-colors">{div.ticker}</td>
-                      <td className="py-4 text-slate-400 text-sm">{new Date(div.date).toLocaleDateString('pt-BR')}</td>
+                      <td className="py-4 text-slate-400 text-sm">{formatDateSafe(div.date)}</td>
                       <td className="py-4">
                         <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-md ${
                           div.type === DividendType.DIVIDENDO ? 'bg-blue-500/10 text-blue-400' : 'bg-orange-500/10 text-orange-400'

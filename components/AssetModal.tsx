@@ -4,7 +4,6 @@ import { Asset } from '../types.ts';
 import { usePortfolio } from '../store/PortfolioContext.tsx';
 import { X, TrendingUp } from 'lucide-react';
 
-// Define the interface for the component props to fix missing name error
 interface AssetModalProps {
   asset: Asset;
   onClose: () => void;
@@ -18,10 +17,15 @@ export default function AssetModal({ asset, onClose }: AssetModalProps) {
 
   const totalDividends = assetDividends.reduce((sum, d) => sum + d.totalAmount, 0);
 
-  // Valor Investido (Custo de Aquisição)
   const investedVal = asset.totalQuantity * asset.averagePrice;
-  // Patrimônio Atual = Valor Investido + Proventos Recebidos
   const patrimonioAtual = investedVal + totalDividends;
+
+  // Função de formatação segura que não sofre com fuso horário
+  const formatDateSafe = (dateString: string) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.substring(0, 10).split('-');
+    return `${day}/${month}/${year}`;
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -77,10 +81,12 @@ export default function AssetModal({ asset, onClose }: AssetModalProps) {
                 {assetTransactions.length === 0 ? (
                   <p className="text-sm text-slate-500 italic py-4">Nenhuma compra registrada.</p>
                 ) : (
-                  assetTransactions.map((tx) => (
+                  assetTransactions
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .map((tx) => (
                     <div key={tx.id} className="flex justify-between items-center p-3 bg-slate-800/30 rounded-xl border border-slate-800">
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium">{new Date(tx.date).toLocaleDateString('pt-BR')}</span>
+                        <span className="text-sm font-medium">{formatDateSafe(tx.date)}</span>
                         <span className="text-[10px] text-slate-500 uppercase">Compra</span>
                       </div>
                       <div className="text-right">

@@ -29,11 +29,9 @@ export default function HistoryView() {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
-    // Garante que pegamos apenas a parte da data YYYY-MM-DD
-    const cleanDate = dateString.substring(0, 10);
-    const [year, month, day] = cleanDate.split('-').map(Number);
-    // Cria data local sem deslocamento de fuso horário
-    return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
+    // Formatação via string pura para ignorar fuso horário do navegador
+    const [year, month, day] = dateString.substring(0, 10).split('-');
+    return `${day}/${month}/${year}`;
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
