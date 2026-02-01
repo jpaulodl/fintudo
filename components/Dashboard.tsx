@@ -9,11 +9,12 @@ export default function Dashboard() {
   const { assets, dividends } = usePortfolio();
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
 
+  // Define groupedAssets with a string key record to ensure stable typing for Object.entries
   const groupedAssets = assets.reduce((acc, asset) => {
     if (!acc[asset.category]) acc[asset.category] = [];
     acc[asset.category].push(asset);
     return acc;
-  }, {} as Record<Category, Asset[]>);
+  }, {} as Record<string, Asset[]>);
 
   const totalInvested = assets.reduce((total, a) => total + (a.totalQuantity * a.averagePrice), 0);
   const totalDividends = dividends.reduce((total, d) => total + d.totalAmount, 0);
@@ -60,7 +61,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {Object.entries(groupedAssets).map(([category, categoryAssets]) => (
+      {/* Explicitly cast Object.entries to ensure the map function is available and categoryAssets is treated as Asset[] */}
+      {(Object.entries(groupedAssets) as [string, Asset[]][]).map(([category, categoryAssets]) => (
         <div key={category} className="space-y-4">
           <h3 className="text-xl font-semibold border-l-4 border-emerald-500 pl-3">{category}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -89,15 +91,17 @@ export default function Dashboard() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-baseline">
                       <span className="text-slate-500 text-xs font-medium uppercase tracking-tighter">Posição</span>
-                      <span className="font-bold text-slate-200">R$ {investedVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="font-bold text-slate-200">R$ {investedVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex justify-between items-baseline">
                       <span className="text-slate-500 text-xs font-medium uppercase tracking-tighter">Quantidade</span>
-                      <span className="text-slate-300 font-medium">{asset.totalQuantity}</span>
+                      <span className="text-slate-300 font-medium">
+                        {asset.totalQuantity.toLocaleString('pt-BR', { maximumFractionDigits: 8 })}
+                      </span>
                     </div>
                     <div className="flex justify-between items-baseline border-t border-slate-800 pt-3 mt-3">
                       <span className="text-slate-500 text-[10px] font-bold uppercase tracking-tighter">Proventos</span>
-                      <span className="text-emerald-500 font-bold text-sm">R$ {assetDividends.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-emerald-500 font-bold text-sm">R$ {assetDividends.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   </div>
                 </div>

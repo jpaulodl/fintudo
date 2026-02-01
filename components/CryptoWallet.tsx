@@ -26,7 +26,7 @@ const CryptoWallet: React.FC = () => {
           <div>
             <p className="text-slate-400 font-medium">Valor Total da Carteira Cripto</p>
             <div className="flex items-baseline gap-2">
-              <h2 className="text-4xl font-extrabold text-white">R$ {totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
+              <h2 className="text-4xl font-extrabold text-white">R$ {totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
             </div>
           </div>
         </div>
@@ -49,11 +49,13 @@ const CryptoWallet: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-slate-500 text-sm">Saldo</span>
-                  <span className="font-medium text-slate-200">{asset.totalQuantity} {asset.ticker}</span>
+                  <span className="font-medium text-slate-200">
+                    {asset.totalQuantity.toLocaleString('pt-BR', { maximumFractionDigits: 8 })} {asset.ticker}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 text-sm">Valor de Aquisição</span>
-                  <span className="text-slate-400">R$ {asset.averagePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  <span className="text-slate-400">R$ {asset.averagePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               </div>
             </div>

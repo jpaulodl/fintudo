@@ -15,6 +15,7 @@ const TransactionForm: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [lastCalculatedPM, setLastCalculatedPM] = useState(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +26,7 @@ const TransactionForm: React.FC = () => {
     
     // Cálculo: Preço Unitário = Preço Total / Quantidade
     const unitPrice = total / qty;
+    setLastCalculatedPM(unitPrice);
 
     setTimeout(() => {
       addTransaction({
@@ -156,7 +158,7 @@ const TransactionForm: React.FC = () => {
 
           {success && (
             <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-2xl text-center animate-in fade-in zoom-in duration-300 font-medium">
-              Operação registrada! PM calculado como: R$ {(parseFloat(formData.totalPrice) / parseFloat(formData.quantity)).toFixed(2)}
+              Operação registrada! PM calculado como: R$ {lastCalculatedPM.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           )}
         </form>

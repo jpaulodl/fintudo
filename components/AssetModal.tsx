@@ -4,6 +4,7 @@ import { Asset } from '../types.ts';
 import { usePortfolio } from '../store/PortfolioContext.tsx';
 import { X, TrendingUp } from 'lucide-react';
 
+// Define the interface for the component props to fix missing name error
 interface AssetModalProps {
   asset: Asset;
   onClose: () => void;
@@ -49,20 +50,20 @@ export default function AssetModal({ asset, onClose }: AssetModalProps) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
             <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
               <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">Preço Médio</p>
-              <p className="text-lg font-bold">R$ {asset.averagePrice.toFixed(2)}</p>
+              <p className="text-lg font-bold">R$ {asset.averagePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             </div>
             <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
               <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">Proventos</p>
-              <p className="text-lg font-bold text-emerald-400">R$ {totalDividends.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <p className="text-lg font-bold text-emerald-400">R$ {totalDividends.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             </div>
             <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
               <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">Quantidade</p>
-              <p className="text-lg font-bold">{asset.totalQuantity}</p>
+              <p className="text-lg font-bold">{asset.totalQuantity.toLocaleString('pt-BR', { maximumFractionDigits: 8 })}</p>
             </div>
             <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
               <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">Patrimônio Atual</p>
               <p className="text-lg font-bold text-white">
-                R$ {patrimonioAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                R$ {patrimonioAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
           </div>
@@ -83,8 +84,8 @@ export default function AssetModal({ asset, onClose }: AssetModalProps) {
                         <span className="text-[10px] text-slate-500 uppercase">Compra</span>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-slate-200">R$ {tx.price.toFixed(2)}</p>
-                        <p className="text-[10px] text-slate-400">Qtd: {tx.quantity}</p>
+                        <p className="text-sm font-bold text-slate-200">R$ {tx.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p className="text-[10px] text-slate-400">Qtd: {tx.quantity.toLocaleString('pt-BR', { maximumFractionDigits: 8 })}</p>
                       </div>
                     </div>
                   ))

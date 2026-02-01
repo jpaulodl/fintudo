@@ -6,8 +6,10 @@ import { supabase } from '../lib/supabase.ts';
 interface PortfolioContextType extends PortfolioState {
   addTransaction: (tx: Omit<Transaction, 'id'>) => Promise<void>;
   removeTransaction: (id: string) => Promise<void>;
+  updateTransaction: (id: string, updates: Partial<Transaction>) => Promise<void>;
   addDividend: (div: Omit<Dividend, 'id'>) => Promise<void>;
   removeDividend: (id: string) => Promise<void>;
+  updateDividend: (id: string, updates: Partial<Dividend>) => Promise<void>;
   setUser: (user: { name: string; email: string; id: string } | null) => void;
   logout: () => Promise<void>;
 }
@@ -22,7 +24,6 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     user: null
   });
 
-  // Carrega dados iniciais do usuário se houver sessão
   useEffect(() => {
     const initSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -135,6 +136,25 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, []);
 
+  const updateTransaction = useCallback(async (id: string, updates: Partial<Transaction>) => {
+    const { data, error } = await supabase
+      .from('transactions')
+      .update(updates)
+      .eq('id', id)
+      .select();
+    
+    if (!error && data) {
+      setState(prev => {
+        const updatedTransactions = prev.transactions.map(t => t.id === id ? { ...t, ...data[0] } : t);
+        return {
+          ...prev,
+          transactions: updatedTransactions,
+          assets: rebuildAssets(updatedTransactions)
+        };
+      });
+    }
+  }, []);
+
   const addDividend = useCallback(async (divData: Omit<Dividend, 'id'>) => {
     if (!state.user) return;
     const { data, error } = await supabase
@@ -160,13 +180,30 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, []);
 
+  const updateDividend = useCallback(async (id: string, updates: Partial<Dividend>) => {
+    const { data, error } = await supabase
+      .from('dividends')
+      .update(updates)
+      .eq('id', id)
+      .select();
+    
+    if (!error && data) {
+      setState(prev => ({
+        ...prev,
+        dividends: prev.dividends.map(d => d.id === id ? { ...d, ...data[0] } : d)
+      }));
+    }
+  }, []);
+
   return (
     <PortfolioContext.Provider value={{ 
       ...state, 
       addTransaction, 
       removeTransaction, 
+      updateTransaction,
       addDividend, 
       removeDividend, 
+      updateDividend,
       setUser, 
       logout 
     }}>
