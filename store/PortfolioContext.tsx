@@ -143,7 +143,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       .eq('id', id)
       .select();
     
-    if (!error && data) {
+    if (error) {
+      console.error('Erro ao atualizar transação:', error.message);
+      return;
+    }
+
+    if (data) {
       setState(prev => {
         const updatedTransactions = prev.transactions.map(t => t.id === id ? { ...t, ...data[0] } : t);
         return {
@@ -187,7 +192,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       .eq('id', id)
       .select();
     
-    if (!error && data) {
+    if (error) {
+      console.error('Erro ao atualizar provento:', error.message);
+      return;
+    }
+
+    if (data) {
       setState(prev => ({
         ...prev,
         dividends: prev.dividends.map(d => d.id === id ? { ...d, ...data[0] } : d)

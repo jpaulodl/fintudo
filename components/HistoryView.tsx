@@ -17,6 +17,7 @@ export default function HistoryView() {
   const [view, setView] = useState<'ops' | 'divs'>('ops');
   const [searchTerm, setSearchTerm] = useState('');
   const [editingItem, setEditingItem] = useState<{ type: 'ops' | 'divs', data: any } | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const filteredTransactions = transactions
     .filter(t => t.ticker.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -27,8 +28,11 @@ export default function HistoryView() {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const formatDate = (dateString: string) => {
-    // Corrige problema de fuso horário separando os componentes da data
-    const [year, month, day] = dateString.split('-').map(Number);
+    if (!dateString) return '';
+    // Garante que pegamos apenas a parte da data YYYY-MM-DD
+    const cleanDate = dateString.substring(0, 10);
+    const [year, month, day] = cleanDate.split('-').map(Number);
+    // Cria data local sem deslocamento de fuso horário
     return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
   };
 
@@ -36,25 +40,33 @@ export default function HistoryView() {
     e.preventDefault();
     if (!editingItem) return;
 
+    setIsSaving(true);
     const { type, data } = editingItem;
-    if (type === 'ops') {
-      await updateTransaction(data.id, {
-        ticker: data.ticker.toUpperCase(),
-        date: data.date,
-        price: parseFloat(data.price),
-        quantity: parseFloat(data.quantity),
-        category: data.category
-      });
-    } else {
-      await updateDividend(data.id, {
-        ticker: data.ticker.toUpperCase(),
-        date: data.date,
-        type: data.type,
-        amountPerShare: parseFloat(data.amountPerShare),
-        totalAmount: parseFloat(data.totalAmount)
-      });
+    
+    try {
+      if (type === 'ops') {
+        await updateTransaction(data.id, {
+          ticker: data.ticker.toUpperCase(),
+          date: data.date,
+          price: parseFloat(data.price),
+          quantity: parseFloat(data.quantity),
+          category: data.category
+        });
+      } else {
+        await updateDividend(data.id, {
+          ticker: data.ticker.toUpperCase(),
+          date: data.date,
+          type: data.type,
+          amountPerShare: parseFloat(data.amountPerShare),
+          totalAmount: parseFloat(data.totalAmount)
+        });
+      }
+      setEditingItem(null);
+    } catch (error) {
+      console.error("Falha ao salvar:", error);
+    } finally {
+      setIsSaving(false);
     }
-    setEditingItem(null);
   };
 
   return (
@@ -201,7 +213,7 @@ export default function HistoryView() {
       {/* Modal de Edição */}
       {editingItem && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setEditingItem(null)}></div>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => !isSaving && setEditingItem(null)}></div>
           <div className="relative bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="p-6 border-b border-slate-800 flex justify-between items-center">
               <h3 className="text-xl font-bold flex items-center gap-2">
@@ -315,9 +327,10 @@ export default function HistoryView() {
 
               <button 
                 type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/10 flex items-center justify-center gap-2 transition-all mt-4"
+                disabled={isSaving}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/10 flex items-center justify-center gap-2 transition-all mt-4 disabled:opacity-50"
               >
-                <sync size={18} /> Salvar Alterações
+                {isSaving ? 'Salvando...' : <><Save size={18} /> Salvar Alterações</>}
               </button>
             </form>
           </div>
