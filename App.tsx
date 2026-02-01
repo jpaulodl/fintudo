@@ -73,7 +73,7 @@ const AuthScreen: React.FC = () => {
             <LogIn className="text-emerald-500 w-8 h-8" />
           </div>
           <h1 className="text-3xl font-extrabold text-white">FinTudo</h1>
-          <p className="text-slate-500 mt-2">Sua carteira conectada ao Supabase.</p>
+          <p className="text-slate-500 mt-2">Sua carteira conectada!/p>
         </div>
 
         {error && (
